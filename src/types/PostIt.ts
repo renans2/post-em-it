@@ -4,6 +4,6 @@ export type PostIt = {
   textColor: string;
   content: string;
   rotation: string;
-  createdAt: string;
-  lastModifiedAt?: string;
+  createdAt: number;
+  lastModifiedAt?: number;
 };

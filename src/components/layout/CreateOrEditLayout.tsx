@@ -34,7 +34,7 @@ export default function CreateOrEditLayout({
       content,
       bgColor,
       textColor,
-      createdAt: new Date().toLocaleString(),
+      createdAt: Date.now(),
       rotation: `rotate(${Math.random() * 10 - 5}deg)`,
     });
     close();
@@ -54,7 +54,7 @@ export default function CreateOrEditLayout({
         content,
         bgColor,
         textColor,
-        lastModifiedAt: new Date().toLocaleString(),
+        lastModifiedAt: Date.now(),
       });
       close();
     }
@@ -67,7 +67,7 @@ export default function CreateOrEditLayout({
   return (
     <div
       onClick={handleBackdropClick}
-      className="z-100 fixed inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-lg"
+      className="z-100 fixed inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-lg m-0"
     >
       <div className="w-full max-w-lg p-4">
         <div className="flex items-center justify-between">

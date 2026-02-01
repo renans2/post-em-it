@@ -2,14 +2,15 @@ import { useState } from "react";
 import { usePostIts } from "../context/postits-context-provider";
 import CreateOrEditLayout from "./CreateOrEditLayout";
 import type { PostIt } from "../../types/PostIt";
+import type { SortBy, SortOrder } from "../../types/sort";
 
 export default function Main() {
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState<PostIt>();
-  const { postIts } = usePostIts();
+  const { postIts, sortBy, sortOrder, setSortBy, setSortOrder } = usePostIts();
 
   return (
-    <main className="max-w-4xl mx-auto p-4">
+    <main className="max-w-4xl mx-auto p-4 space-y-10">
       {isCreating && (
         <CreateOrEditLayout
           data={{ type: "create" }}
@@ -32,15 +33,38 @@ export default function Main() {
             background:
               "linear-gradient(to right, #E3E3E3, #E3E3E3 10%, #FDFDFD 20%, #FFFFFF)",
           }}
-          onClick={() => {
-            console.log("hello");
-            setIsCreating(true);
-          }}
+          onClick={() => setIsCreating(true)}
         >
           + New
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-20 gap-x-10 mt-20">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-0 justify-between md:justify-between md:items-center">
+        <label htmlFor="sortBy" className="flex items-center gap-3">
+          <span>Sort by:</span>
+          <select
+            id="sortBy"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
+            className="p-1 bg-white flex-1"
+          >
+            <option value="created_at">Created At</option>
+            <option value="last_modified_at">Last Modified At</option>
+          </select>
+        </label>
+        <label htmlFor="sortOrder" className="flex items-center gap-3">
+          <span>Sort Order:</span>
+          <select
+            id="sortOrder"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+            className="p-1 bg-white flex-1"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </label>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-20 gap-x-10">
         {postIts.map((postIt) => (
           <div
             key={postIt.id}
@@ -56,11 +80,12 @@ export default function Main() {
               {postIt.content}
             </div>
             <p className="text-sm absolute top-[103%] w-full left-0 text-center font-medium text-black/30">
-              Created at: {postIt.createdAt}
+              Created at: {new Date(postIt.createdAt).toLocaleString()}
             </p>
             {postIt.lastModifiedAt && (
               <p className="text-sm absolute top-[110%] w-full left-0 text-center font-medium text-black/30">
-                Last modified at: {postIt.lastModifiedAt}
+                Last modified at:{" "}
+                {new Date(postIt.lastModifiedAt).toLocaleString()}
               </p>
             )}
           </div>
