@@ -6,22 +6,26 @@ import {
   INITIAL_TEXT_COLOR,
   TEXT_COLORS,
 } from "../../constants/colors";
-import useLocalStorage from "../../hooks/useLocalStorage";
+import type { PostIt } from "../../types/PostIt";
 
-type CreatingLayoutType = {
+type CreateOrEditLayoutType = {
+  data: { type: "create" } | { type: "edit"; postIt: PostIt };
   close: () => void;
 };
 
-export default function CreatingLayout({ close }: CreatingLayoutType) {
-  const { nextId, addPostIt } = usePostIts();
-  const [content, setContent] = useState("");
-  const [bgColor, setBgColor] = useLocalStorage<string>(
-    "initial_bg_color",
-    INITIAL_BG_COLOR,
+export default function CreateOrEditLayout({
+  data,
+  close,
+}: CreateOrEditLayoutType) {
+  const { nextId, addPostIt, deletePostIt, editPostIt } = usePostIts();
+  const [content, setContent] = useState(
+    data.type === "edit" ? data.postIt.content : "",
   );
-  const [textColor, setTextColor] = useLocalStorage<string>(
-    "initial_text_color",
-    INITIAL_TEXT_COLOR,
+  const [bgColor, setBgColor] = useState<string>(
+    data.type === "edit" ? data.postIt.bgColor : INITIAL_BG_COLOR,
+  );
+  const [textColor, setTextColor] = useState<string>(
+    data.type === "edit" ? data.postIt.textColor : INITIAL_TEXT_COLOR,
   );
 
   const handleCreate = () => {
@@ -31,8 +35,29 @@ export default function CreatingLayout({ close }: CreatingLayoutType) {
       bgColor,
       textColor,
       createdAt: new Date().toLocaleString(),
+      rotation: `rotate(${Math.random() * 10 - 5}deg)`,
     });
     close();
+  };
+
+  const handleDelete = () => {
+    if (data.type === "edit") {
+      deletePostIt(data.postIt.id);
+      close();
+    }
+  };
+
+  const handleEdit = () => {
+    if (data.type === "edit") {
+      editPostIt({
+        ...data.postIt,
+        content,
+        bgColor,
+        textColor,
+        lastModifiedAt: new Date().toLocaleString(),
+      });
+      close();
+    }
   };
 
   const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -51,7 +76,8 @@ export default function CreatingLayout({ close }: CreatingLayoutType) {
             <div className="flex items-center gap-2 mt-1">
               {BG_COLORS.map((color) => (
                 <div
-                  style={{ backgroundColor: color }}
+                  key={color}
+                  style={{ background: color }}
                   className={`${color === bgColor ? "border-4 cursor-not-allowed" : "hover:scale-125 cursor-pointer"} w-7 h-7`}
                   onClick={() => setBgColor(color)}
                 />
@@ -63,7 +89,8 @@ export default function CreatingLayout({ close }: CreatingLayoutType) {
             <div className="flex items-center gap-2">
               {TEXT_COLORS.map((color) => (
                 <div
-                  style={{ backgroundColor: color }}
+                  key={color}
+                  style={{ background: color }}
                   className={`${color === textColor ? `border-4 cursor-not-allowed ${textColor === "#000000" && "border-white"}` : "hover:scale-125 cursor-pointer"} w-7 h-7`}
                   onClick={() => setTextColor(color)}
                 />
@@ -75,8 +102,8 @@ export default function CreatingLayout({ close }: CreatingLayoutType) {
           onChange={(e) => setContent(e.target.value)}
           value={content}
           placeholder="Type here..."
-          style={{ backgroundColor: bgColor, color: textColor }}
-          className={`w-full aspect-square mt-4 p-5 text-2xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
+          style={{ background: bgColor, color: textColor }}
+          className={`w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
         />
         <div className="flex items-center justify-between">
           <button
@@ -85,11 +112,22 @@ export default function CreatingLayout({ close }: CreatingLayoutType) {
           >
             Cancel
           </button>
+          {data.type === "edit" && (
+            <button
+              onClick={handleDelete}
+              className="cursor-pointer p-2 bg-amber-200 hover:scale-110"
+            >
+              Delete
+            </button>
+          )}
           <button
-            onClick={handleCreate}
-            className="cursor-pointer p-2 bg-amber-200 hover:scale-110"
+            className="p-2 bg-amber-200 not-disabled:hover:scale-110"
+            disabled={content === ""}
+            onClick={() =>
+              data.type === "create" ? handleCreate() : handleEdit()
+            }
           >
-            Create
+            {data.type === "create" ? "Create" : "Save"}
           </button>
         </div>
       </div>

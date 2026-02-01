@@ -6,7 +6,8 @@ type PostItsContextType = {
   nextId: number;
   postIts: PostIt[];
   addPostIt: (postIt: PostIt) => void;
-  deletePostIt: (postIt: PostIt) => void;
+  deletePostIt: (postItId: number) => void;
+  editPostIt: (postIt: PostIt) => void;
 };
 
 const PostItsContext = createContext<PostItsContextType | undefined>(undefined);
@@ -24,8 +25,12 @@ export default function PostItsProvider({
     setNextId((prev) => prev + 1);
   };
 
-  const deletePostIt = (postIt: PostIt) => {
-    setPostIts((prev) => prev.filter((p) => p.id !== postIt.id));
+  const deletePostIt = (postItId: number) => {
+    setPostIts((prev) => prev.filter((p) => p.id !== postItId));
+  };
+
+  const editPostIt = (postIt: PostIt) => {
+    setPostIts((prev) => prev.map((p) => (p.id !== postIt.id ? p : postIt)));
   };
 
   return (
@@ -35,6 +40,7 @@ export default function PostItsProvider({
         postIts,
         addPostIt,
         deletePostIt,
+        editPostIt,
       }}
     >
       {children}
