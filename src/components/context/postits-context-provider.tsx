@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useContext } from "react";
 import type { PostIt } from "../../types/PostIt";
 import useLocalStorage from "../../hooks/useLocalStorage";
 
@@ -9,7 +9,7 @@ type PostItsContextType = {
   deletePostIt: (postIt: PostIt) => void;
 };
 
-const PostItContext = createContext<PostItsContextType | undefined>(undefined);
+const PostItsContext = createContext<PostItsContextType | undefined>(undefined);
 
 export default function PostItsProvider({
   children,
@@ -29,7 +29,7 @@ export default function PostItsProvider({
   };
 
   return (
-    <PostItContext
+    <PostItsContext
       value={{
         nextId,
         postIts,
@@ -38,6 +38,17 @@ export default function PostItsProvider({
       }}
     >
       {children}
-    </PostItContext>
+    </PostItsContext>
   );
 }
+
+export const usePostIts = () => {
+  const context = useContext(PostItsContext);
+
+  if (!context)
+    throw new Error(
+      "The usePostIts hook must be used within the PostItsProvider",
+    );
+
+  return context;
+};
