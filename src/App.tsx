@@ -1,8 +1,12 @@
+import Header from "./components/layout/Header";
+import Main from "./components/layout/Main";
+
 function App() {
   return (
-    <main>
-      <h1 className="text-4xl text-blue-600">testing</h1>
-    </main>
+    <div className="h-screen bg-gray-300 overflow-y-auto">
+      <Header />
+      <Main />
+    </div>
   );
 }
 
