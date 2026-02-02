@@ -1,12 +1,7 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
 import { usePostIts } from "../context/postits-context-provider";
-import {
-  BG_COLORS,
-  INITIAL_BG_COLOR,
-  INITIAL_TEXT_COLOR,
-  TEXT_COLORS,
-} from "../../constants/colors";
-import type { PostIt } from "../../types/PostIt";
+import { BG_COLORS, TEXT_COLORS } from "../../constants/colors";
+import type { PostIt } from "../../types/post-it";
 import { FONT_CLASSES } from "../../constants/fonts";
 import useFontSize from "../../hooks/useFontSize";
 
@@ -24,25 +19,25 @@ export default function CreateOrEditLayout({
   const [content, setContent] = useState(
     data.type === "edit" ? data.postIt.content : "",
   );
-  const [bgColor, setBgColor] = useState<string>(
-    data.type === "edit" ? data.postIt.bgColor : INITIAL_BG_COLOR,
+  const [bgColorIndex, setBgColor] = useState<number>(
+    data.type === "edit" ? data.postIt.bgColorIndex : 0,
   );
-  const [textColor, setTextColor] = useState<string>(
-    data.type === "edit" ? data.postIt.textColor : INITIAL_TEXT_COLOR,
+  const [textColorIndex, setTextColor] = useState<number>(
+    data.type === "edit" ? data.postIt.textColorIndex : 0,
   );
-  const [fontType, setFontType] = useState<number>(
-    data.type === "edit" ? data.postIt.fontType : 0,
+  const [fontIndex, setFontType] = useState<number>(
+    data.type === "edit" ? data.postIt.fontIndex : 0,
   );
 
   const handleCreate = () => {
     addPostIt({
       id: nextId,
       content,
-      bgColor,
-      textColor,
+      bgColorIndex,
+      textColorIndex,
       createdAt: Date.now(),
-      rotation: `rotate(${Math.random() * 10 - 5}deg)`,
-      fontType,
+      rotation: Number((Math.random() * 10 - 5).toFixed(3)),
+      fontIndex,
     });
     close();
   };
@@ -59,10 +54,10 @@ export default function CreateOrEditLayout({
       editPostIt({
         ...data.postIt,
         content,
-        bgColor,
-        textColor,
+        bgColorIndex,
+        textColorIndex,
         lastModifiedAt: Date.now(),
-        fontType,
+        fontIndex,
       });
       close();
     }
@@ -82,11 +77,11 @@ export default function CreateOrEditLayout({
           <div className="space-y-2">
             <h4 className="font-medium text-xl text-white">Font Type</h4>
             <div className="flex items-center gap-2">
-              {FONT_CLASSES.map((_, index) => (
+              {FONT_CLASSES.map((font, index) => (
                 <div
-                  className={`${FONT_CLASSES[index]} ${fontType === index ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex justify-center items-center font-bold bg-white text-black flex-1 h-8`}
+                  key={font}
+                  className={`${FONT_CLASSES[index]} ${fontIndex === index ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex justify-center items-center font-bold bg-white text-black flex-1 h-8`}
                   onClick={() => setFontType(index)}
-                  key={index}
                 >
                   {index}
                 </div>
@@ -96,12 +91,12 @@ export default function CreateOrEditLayout({
           <div className="space-y-2">
             <h4 className="font-medium text-xl text-white">Background Color</h4>
             <div className="flex items-center gap-1">
-              {BG_COLORS.map((color) => (
+              {BG_COLORS.map((color, i) => (
                 <div
                   key={color}
                   style={{ background: color }}
-                  className={`${color === bgColor ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
-                  onClick={() => setBgColor(color)}
+                  className={`${i === bgColorIndex ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
+                  onClick={() => setBgColor(i)}
                 />
               ))}
             </div>
@@ -109,12 +104,12 @@ export default function CreateOrEditLayout({
           <div className="space-y-2">
             <h4 className="font-medium text-xl text-white">Text Color</h4>
             <div className="flex items-center gap-1">
-              {TEXT_COLORS.map((color) => (
+              {TEXT_COLORS.map((color, i) => (
                 <div
                   key={color}
                   style={{ background: color }}
-                  className={`${color === textColor ? `border-4 cursor-not-allowed ${textColor === "#000000" && "border-white"}` : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
-                  onClick={() => setTextColor(color)}
+                  className={`${i === textColorIndex ? `border-4 cursor-not-allowed ${textColorIndex === 0 && "border-white"}` : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
+                  onClick={() => setTextColor(i)}
                 />
               ))}
             </div>
@@ -125,8 +120,12 @@ export default function CreateOrEditLayout({
           onChange={(e) => setContent(e.target.value)}
           value={content}
           placeholder="Type here..."
-          style={{ background: bgColor, color: textColor, fontSize }}
-          className={`${FONT_CLASSES[fontType]} w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
+          style={{
+            background: BG_COLORS[bgColorIndex],
+            color: TEXT_COLORS[textColorIndex],
+            fontSize,
+          }}
+          className={`${FONT_CLASSES[fontIndex]} w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
         />
         <div className="flex items-center justify-between">
           <button

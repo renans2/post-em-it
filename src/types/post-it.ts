@@ -1,10 +1,10 @@
 export type PostIt = {
   id: number;
-  bgColor: string;
-  textColor: string;
+  bgColorIndex: number;
+  textColorIndex: number;
+  fontIndex: number;
   content: string;
-  rotation: string;
+  rotation: number;
   createdAt: number;
   lastModifiedAt?: number;
-  fontType: number;
 };

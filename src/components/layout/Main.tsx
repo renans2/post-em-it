@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { usePostIts } from "../context/postits-context-provider";
 import CreateOrEditLayout from "./CreateOrEditLayout";
-import type { PostIt } from "../../types/PostIt";
+import type { PostIt } from "../../types/post-it";
 import type { SortBy, SortOrder } from "../../types/sort";
 import { FONT_CLASSES } from "../../constants/fonts";
 import useFontSize from "../../hooks/useFontSize";
+import { BG_COLORS, TEXT_COLORS } from "../../constants/colors";
 
 export default function Main() {
   const [isCreating, setIsCreating] = useState(false);
@@ -73,12 +74,12 @@ export default function Main() {
             ref={i === 0 ? ref : undefined}
             key={postIt.id}
             style={{
-              background: postIt.bgColor,
-              color: postIt.textColor,
-              transform: postIt.rotation,
+              background: BG_COLORS[postIt.bgColorIndex],
+              color: TEXT_COLORS[postIt.textColorIndex],
+              transform: `rotate(${postIt.rotation}deg)`,
               fontSize,
             }}
-            className={`${FONT_CLASSES[postIt.fontType]} group relative hover:scale-102 w-full aspect-square pt-[15%] p-[5%] group cursor-pointer shadow-[0px_12px_12px_-2px_rgba(0,0,0,0.2)]`}
+            className={`${FONT_CLASSES[postIt.fontIndex]} group relative hover:scale-102 w-full aspect-square pt-[15%] p-[5%] group cursor-pointer shadow-[0px_12px_12px_-2px_rgba(0,0,0,0.2)]`}
             onClick={() => setIsEditing(postIt)}
           >
             <textarea

@@ -4,7 +4,7 @@ import React, {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import type { PostIt } from "../../types/PostIt";
+import type { PostIt } from "../../types/post-it";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import type { SortBy, SortOrder } from "../../types/sort";
 

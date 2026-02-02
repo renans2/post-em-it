@@ -13,6 +13,3 @@ export const TEXT_COLORS = [
   "#FF0000",
   "#00DD00",
 ];
-
-export const INITIAL_BG_COLOR = BG_COLORS[0];
-export const INITIAL_TEXT_COLOR = TEXT_COLORS[0];
