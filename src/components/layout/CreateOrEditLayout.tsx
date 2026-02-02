@@ -4,6 +4,7 @@ import { BG_COLORS, TEXT_COLORS } from "../../constants/colors";
 import type { PostIt } from "../../types/post-it";
 import { FONT_CLASSES } from "../../constants/fonts";
 import useFontSize from "../../hooks/useFontSize";
+import { EMPTY_POST_IT } from "../../constants/empty-post-it";
 
 type CreateOrEditLayoutType = {
   data: { type: "create" } | { type: "edit"; postIt: PostIt };
@@ -16,52 +17,44 @@ export default function CreateOrEditLayout({
 }: CreateOrEditLayoutType) {
   const { nextId, addPostIt, deletePostIt, editPostIt } = usePostIts();
   const { ref, fontSize } = useFontSize(undefined);
-  const [content, setContent] = useState(
-    data.type === "edit" ? data.postIt.content : "",
+  const [postIt, setPostIt] = useState<PostIt>(() =>
+    data.type === "edit" ? data.postIt : EMPTY_POST_IT,
   );
-  const [bgColorIndex, setBgColor] = useState<number>(
-    data.type === "edit" ? data.postIt.bgColorIndex : 0,
-  );
-  const [textColorIndex, setTextColor] = useState<number>(
-    data.type === "edit" ? data.postIt.textColorIndex : 0,
-  );
-  const [fontIndex, setFontType] = useState<number>(
-    data.type === "edit" ? data.postIt.fontIndex : 0,
-  );
+
+  const handleChange = (key: keyof PostIt, val: any) => {
+    setPostIt((prev) => ({
+      ...prev,
+      [key]: val,
+    }));
+  };
 
   const handleCreate = () => {
     addPostIt({
+      ...postIt,
       id: nextId,
-      content,
-      bgColorIndex,
-      textColorIndex,
-      createdAt: Date.now(),
       rotation: Number((Math.random() * 10 - 5).toFixed(3)),
-      fontIndex,
+      createdAt: Date.now(),
     });
     close();
   };
 
   const handleDelete = () => {
-    if (data.type === "edit") {
-      deletePostIt(data.postIt.id);
-      close();
-    }
+    if (data.type === "create") return;
+    deletePostIt(data.postIt.id);
+    close();
   };
 
   const handleEdit = () => {
-    if (data.type === "edit") {
-      editPostIt({
-        ...data.postIt,
-        content,
-        bgColorIndex,
-        textColorIndex,
-        lastModifiedAt: Date.now(),
-        fontIndex,
-      });
-      close();
-    }
+    if (data.type === "create") return;
+    editPostIt({
+      ...postIt,
+      lastModifiedAt: Date.now(),
+    });
+    close();
   };
+
+  const handleSubmit = () =>
+    data.type === "create" ? handleCreate() : handleEdit();
 
   const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) close();
@@ -77,13 +70,13 @@ export default function CreateOrEditLayout({
           <div className="space-y-2">
             <h4 className="font-medium text-xl text-white">Font Type</h4>
             <div className="flex items-center gap-2">
-              {FONT_CLASSES.map((font, index) => (
+              {FONT_CLASSES.map((font, i) => (
                 <div
                   key={font}
-                  className={`${FONT_CLASSES[index]} ${fontIndex === index ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex justify-center items-center font-bold bg-white text-black flex-1 h-8`}
-                  onClick={() => setFontType(index)}
+                  className={`${FONT_CLASSES[i]} ${postIt.fontIndex === i ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex justify-center items-center font-bold bg-white text-black flex-1 h-8`}
+                  onClick={() => handleChange("fontIndex", i)}
                 >
-                  {index}
+                  {i}
                 </div>
               ))}
             </div>
@@ -95,8 +88,8 @@ export default function CreateOrEditLayout({
                 <div
                   key={color}
                   style={{ background: color }}
-                  className={`${i === bgColorIndex ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
-                  onClick={() => setBgColor(i)}
+                  className={`${i === postIt.bgColorIndex ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
+                  onClick={() => handleChange("bgColorIndex", i)}
                 />
               ))}
             </div>
@@ -108,8 +101,8 @@ export default function CreateOrEditLayout({
                 <div
                   key={color}
                   style={{ background: color }}
-                  className={`${i === textColorIndex ? `border-4 cursor-not-allowed ${textColorIndex === 0 && "border-white"}` : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
-                  onClick={() => setTextColor(i)}
+                  className={`${i === postIt.textColorIndex ? `border-4 cursor-not-allowed ${postIt.textColorIndex === 0 && "border-white"}` : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
+                  onClick={() => handleChange("textColorIndex", i)}
                 />
               ))}
             </div>
@@ -117,15 +110,15 @@ export default function CreateOrEditLayout({
         </div>
         <textarea
           ref={ref}
-          onChange={(e) => setContent(e.target.value)}
-          value={content}
+          onChange={(e) => handleChange("content", e.target.value)}
+          value={postIt.content}
           placeholder="Type here..."
           style={{
-            background: BG_COLORS[bgColorIndex],
-            color: TEXT_COLORS[textColorIndex],
+            background: BG_COLORS[postIt.bgColorIndex],
+            color: TEXT_COLORS[postIt.textColorIndex],
             fontSize,
           }}
-          className={`${FONT_CLASSES[fontIndex]} w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
+          className={`${FONT_CLASSES[postIt.fontIndex]} w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
         />
         <div className="flex items-center justify-between">
           <button
@@ -144,10 +137,8 @@ export default function CreateOrEditLayout({
           )}
           <button
             className="p-2 bg-amber-200 not-disabled:hover:scale-110"
-            disabled={content === ""}
-            onClick={() =>
-              data.type === "create" ? handleCreate() : handleEdit()
-            }
+            disabled={postIt.content === ""}
+            onClick={handleSubmit}
           >
             {data.type === "create" ? "Create" : "Save"}
           </button>
