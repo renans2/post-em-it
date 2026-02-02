@@ -6,15 +6,16 @@ import type { SortBy, SortOrder } from "../../types/sort";
 import { FONT_CLASSES } from "../../constants/fonts";
 import useFontSize from "../../hooks/useFontSize";
 import { BG_COLORS, TEXT_COLORS } from "../../constants/colors";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function Main() {
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState<PostIt>();
   const { postIts, sortBy, sortOrder, setSortBy, setSortOrder } = usePostIts();
-  const { ref, fontSize } = useFontSize(postIts[0]?.id);
+  const { ref, fontSize } = useFontSize();
 
   return (
-    <main className="max-w-4xl mx-auto p-4 space-y-10">
+    <main className="max-w-4xl mx-auto p-4 pb-35 space-y-10">
       {isCreating && (
         <CreateOrEditLayout
           data={{ type: "create" }}
@@ -69,35 +70,42 @@ export default function Main() {
         </label>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-y-20 gap-x-10">
-        {postIts.map((postIt, i) => (
-          <div
-            ref={i === 0 ? ref : undefined}
-            key={postIt.id}
-            style={{
-              background: BG_COLORS[postIt.bgColorIndex],
-              color: TEXT_COLORS[postIt.textColorIndex],
-              transform: `rotate(${postIt.rotation}deg)`,
-              fontSize,
-            }}
-            className={`${FONT_CLASSES[postIt.fontIndex]} group relative hover:scale-102 w-full aspect-square pt-[15%] p-[5%] group cursor-pointer shadow-[0px_12px_12px_-2px_rgba(0,0,0,0.2)]`}
-            onClick={() => setIsEditing(postIt)}
-          >
-            <textarea
-              readOnly
-              value={postIt.content}
-              className="resize-none h-full focus:outline-0 w-full text-shadow-sm text-shadow-black/40 overflow-y-hidden group-hover:overflow-y-auto"
-            />
-            <p className="text-sm absolute top-[103%] w-full left-0 text-center font-medium text-black/30">
-              Created at: {new Date(postIt.createdAt).toLocaleString()}
-            </p>
-            {postIt.lastModifiedAt && (
-              <p className="text-sm absolute top-[110%] w-full left-0 text-center font-medium text-black/30">
-                Last modified at:{" "}
-                {new Date(postIt.lastModifiedAt).toLocaleString()}
+        <AnimatePresence mode="popLayout">
+          {postIts.map((postIt, i) => (
+            <motion.div
+              layout
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: postIt.rotation }}
+              exit={{ scale: 0, rotate: -10 }}
+              whileHover={{ scale: 1.05, rotate: 0 }}
+              ref={i === 0 ? ref : undefined}
+              key={postIt.id}
+              style={{
+                background: BG_COLORS[postIt.bgColorIndex],
+                color: TEXT_COLORS[postIt.textColorIndex],
+                fontSize,
+              }}
+              className={`${FONT_CLASSES[postIt.fontIndex]} group relative w-full aspect-square pt-[15%] p-[5%] cursor-pointer shadow-[0px_12px_12px_-2px_rgba(0,0,0,0.2)]`}
+              onClick={() => setIsEditing(postIt)}
+            >
+              <textarea
+                id={postIt.id.toString()}
+                readOnly
+                value={postIt.content}
+                className="resize-none h-full focus:outline-0 w-full text-shadow-sm text-shadow-black/40 overflow-y-hidden group-hover:overflow-y-auto"
+              />
+              <p className="text-sm absolute top-[103%] w-full left-0 text-center font-medium text-black/30">
+                Created at: {new Date(postIt.createdAt).toLocaleString()}
               </p>
-            )}
-          </div>
-        ))}
+              {postIt.lastModifiedAt && (
+                <p className="text-sm absolute top-[110%] w-full left-0 text-center font-medium text-black/30">
+                  Last modified at:{" "}
+                  {new Date(postIt.lastModifiedAt).toLocaleString()}
+                </p>
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </main>
   );
