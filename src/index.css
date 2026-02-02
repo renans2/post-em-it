@@ -1,5 +1,40 @@
 @import "tailwindcss";
 
+.arial-font {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.caveat-font {
+  font-family: "Caveat", cursive;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.gamja-font {
+  font-family: "Gamja Flower", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.gloria-font {
+  font-family: "Gloria Hallelujah", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.permanent-marker-font {
+  font-family: "Permanent Marker", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.gochi-font {
+  font-family: "Gochi Hand", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;

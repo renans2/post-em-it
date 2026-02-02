@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { usePostIts } from "../context/postits-context-provider";
 import {
   BG_COLORS,
@@ -7,6 +7,8 @@ import {
   TEXT_COLORS,
 } from "../../constants/colors";
 import type { PostIt } from "../../types/PostIt";
+import { FONT_CLASSES } from "../../constants/fonts";
+import useFontSize from "../../hooks/useFontSize";
 
 type CreateOrEditLayoutType = {
   data: { type: "create" } | { type: "edit"; postIt: PostIt };
@@ -18,6 +20,7 @@ export default function CreateOrEditLayout({
   close,
 }: CreateOrEditLayoutType) {
   const { nextId, addPostIt, deletePostIt, editPostIt } = usePostIts();
+  const { ref, fontSize } = useFontSize(undefined);
   const [content, setContent] = useState(
     data.type === "edit" ? data.postIt.content : "",
   );
@@ -26,6 +29,9 @@ export default function CreateOrEditLayout({
   );
   const [textColor, setTextColor] = useState<string>(
     data.type === "edit" ? data.postIt.textColor : INITIAL_TEXT_COLOR,
+  );
+  const [fontType, setFontType] = useState<number>(
+    data.type === "edit" ? data.postIt.fontType : 0,
   );
 
   const handleCreate = () => {
@@ -36,6 +42,7 @@ export default function CreateOrEditLayout({
       textColor,
       createdAt: Date.now(),
       rotation: `rotate(${Math.random() * 10 - 5}deg)`,
+      fontType,
     });
     close();
   };
@@ -55,6 +62,7 @@ export default function CreateOrEditLayout({
         bgColor,
         textColor,
         lastModifiedAt: Date.now(),
+        fontType,
       });
       close();
     }
@@ -67,31 +75,45 @@ export default function CreateOrEditLayout({
   return (
     <div
       onClick={handleBackdropClick}
-      className="z-100 fixed inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-lg m-0"
+      className="z-100 fixed inset-0 bg-black/50 backdrop-blur-lg m-0"
     >
-      <div className="w-full max-w-lg p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="text-white text-center">Background Color</h4>
-            <div className="flex items-center gap-2 mt-1">
+      <div className="mx-auto w-full max-w-lg p-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h4 className="font-medium text-xl text-white">Font Type</h4>
+            <div className="flex items-center gap-2">
+              {FONT_CLASSES.map((_, index) => (
+                <div
+                  className={`${FONT_CLASSES[index]} ${fontType === index ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex justify-center items-center font-bold bg-white text-black flex-1 h-8`}
+                  onClick={() => setFontType(index)}
+                  key={index}
+                >
+                  {index}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-medium text-xl text-white">Background Color</h4>
+            <div className="flex items-center gap-1">
               {BG_COLORS.map((color) => (
                 <div
                   key={color}
                   style={{ background: color }}
-                  className={`${color === bgColor ? "border-4 cursor-not-allowed" : "hover:scale-125 cursor-pointer"} w-7 h-7`}
+                  className={`${color === bgColor ? "border-4 cursor-not-allowed" : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
                   onClick={() => setBgColor(color)}
                 />
               ))}
             </div>
           </div>
-          <div>
-            <h4 className="text-white text-center">Text Color</h4>
-            <div className="flex items-center gap-2">
+          <div className="space-y-2">
+            <h4 className="font-medium text-xl text-white">Text Color</h4>
+            <div className="flex items-center gap-1">
               {TEXT_COLORS.map((color) => (
                 <div
                   key={color}
                   style={{ background: color }}
-                  className={`${color === textColor ? `border-4 cursor-not-allowed ${textColor === "#000000" && "border-white"}` : "hover:scale-125 cursor-pointer"} w-7 h-7`}
+                  className={`${color === textColor ? `border-4 cursor-not-allowed ${textColor === "#000000" && "border-white"}` : "hover:scale-110 cursor-pointer"} flex-1 h-8`}
                   onClick={() => setTextColor(color)}
                 />
               ))}
@@ -99,11 +121,12 @@ export default function CreateOrEditLayout({
           </div>
         </div>
         <textarea
+          ref={ref}
           onChange={(e) => setContent(e.target.value)}
           value={content}
           placeholder="Type here..."
-          style={{ background: bgColor, color: textColor }}
-          className={`w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
+          style={{ background: bgColor, color: textColor, fontSize }}
+          className={`${FONT_CLASSES[fontType]} w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none placeholder:text-black/10 focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
         />
         <div className="flex items-center justify-between">
           <button

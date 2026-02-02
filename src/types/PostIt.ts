@@ -6,4 +6,5 @@ export type PostIt = {
   rotation: string;
   createdAt: number;
   lastModifiedAt?: number;
+  fontType: number;
 };

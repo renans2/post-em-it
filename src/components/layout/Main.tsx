@@ -3,11 +3,14 @@ import { usePostIts } from "../context/postits-context-provider";
 import CreateOrEditLayout from "./CreateOrEditLayout";
 import type { PostIt } from "../../types/PostIt";
 import type { SortBy, SortOrder } from "../../types/sort";
+import { FONT_CLASSES } from "../../constants/fonts";
+import useFontSize from "../../hooks/useFontSize";
 
 export default function Main() {
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState<PostIt>();
   const { postIts, sortBy, sortOrder, setSortBy, setSortOrder } = usePostIts();
+  const { ref, fontSize } = useFontSize(postIts[0]?.id);
 
   return (
     <main className="max-w-4xl mx-auto p-4 space-y-10">
@@ -65,20 +68,24 @@ export default function Main() {
         </label>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-y-20 gap-x-10">
-        {postIts.map((postIt) => (
+        {postIts.map((postIt, i) => (
           <div
+            ref={i === 0 ? ref : undefined}
             key={postIt.id}
             style={{
               background: postIt.bgColor,
               color: postIt.textColor,
               transform: postIt.rotation,
+              fontSize,
             }}
-            className={`relative hover:scale-102 w-full aspect-square pt-[15%] p-[5%] group cursor-pointer shadow-[0px_12px_12px_-2px_rgba(0,0,0,0.2)]`}
+            className={`${FONT_CLASSES[postIt.fontType]} group relative hover:scale-102 w-full aspect-square pt-[15%] p-[5%] group cursor-pointer shadow-[0px_12px_12px_-2px_rgba(0,0,0,0.2)]`}
             onClick={() => setIsEditing(postIt)}
           >
-            <div className="resize-none w-full pointer-events-none">
-              {postIt.content}
-            </div>
+            <textarea
+              readOnly
+              value={postIt.content}
+              className="resize-none h-full focus:outline-0 w-full text-shadow-sm text-shadow-black/40 overflow-y-hidden group-hover:overflow-y-auto"
+            />
             <p className="text-sm absolute top-[103%] w-full left-0 text-center font-medium text-black/30">
               Created at: {new Date(postIt.createdAt).toLocaleString()}
             </p>
