@@ -77,6 +77,7 @@ export default function CreateOrEditLayout({
         transition={{ duration: 0.15, ease: "easeInOut" }}
         className="mx-auto w-full max-w-lg p-4"
       >
+        {/* PostIt settings */}
         <div className="space-y-4">
           <div className="space-y-2">
             <h4 className="font-medium text-xl text-white">Font Type</h4>
@@ -119,6 +120,7 @@ export default function CreateOrEditLayout({
             </div>
           </div>
         </div>
+        {/* PostIt Area */}
         <textarea
           ref={ref}
           onChange={(e) => handleChange("content", e.target.value)}
@@ -131,6 +133,7 @@ export default function CreateOrEditLayout({
           }}
           className={`placeholder:text-black/5 ${FONT_CLASSES[postIt.fontIndex]} w-full aspect-square mt-4 pt-[15%] p-[5%] text-3xl resize-none focus:outline-gray-700 focus:outline-2 text-shadow-sm text-shadow-black/40`}
         />
+        {/* Action buttons */}
         <div className="flex items-center justify-between gap-10">
           <button
             onClick={close}
