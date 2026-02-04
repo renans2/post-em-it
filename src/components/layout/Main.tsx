@@ -9,11 +9,13 @@ import { BG_COLORS, TEXT_COLORS } from "../../constants/colors";
 import { AnimatePresence, motion } from "motion/react";
 import type { PanelSize } from "../../types/panel-size";
 import useLocalStorage from "../../hooks/useLocalStorage";
+import Toast from "../ui/Toast";
 
 export default function Main() {
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState<PostIt>();
-  const { postIts, sortBy, sortOrder, setSortBy, setSortOrder } = usePostIts();
+  const { postIts, toastType, sortBy, sortOrder, setSortBy, setSortOrder } =
+    usePostIts();
   const { ref, fontSize } = useFontSize();
   const [panelSize, setPanelSize] = useLocalStorage<PanelSize>(
     "panel_size",
@@ -21,20 +23,24 @@ export default function Main() {
   );
 
   return (
-    <main className="p-4 pb-35 space-y-10">
-      {isCreating && (
-        <CreateOrEditLayout
-          data={{ type: "create" }}
-          close={() => setIsCreating(false)}
-        />
-      )}
+    <main className="p-4 space-y-10">
+      <AnimatePresence>
+        {isCreating && (
+          <CreateOrEditLayout
+            data={{ type: "create" }}
+            close={() => setIsCreating(false)}
+          />
+        )}
 
-      {isEditing && (
-        <CreateOrEditLayout
-          data={{ type: "edit", postIt: isEditing }}
-          close={() => setIsEditing(undefined)}
-        />
-      )}
+        {isEditing && (
+          <CreateOrEditLayout
+            data={{ type: "edit", postIt: isEditing }}
+            close={() => setIsEditing(undefined)}
+          />
+        )}
+
+        {toastType && <Toast type={toastType} />}
+      </AnimatePresence>
 
       <div className="caveat-font text-3xl max-w-4xl mx-auto flex items-center justify-between">
         <span>{postIts.length} post-its</span>
@@ -99,22 +105,26 @@ export default function Main() {
           </select>
         </label>
       </div>
+      {postIts.length === 0 && (
+        <p className="text-center caveat-font text-4xl text-black/40">
+          No post-its yet
+        </p>
+      )}
       <div
         className={`mx-auto grid ${
           panelSize === "normal"
-            ? "max-w-4xl grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]"
+            ? "max-w-4xl grid-cols-1 md:grid-cols-3"
             : "grid-cols-[repeat(auto-fit,minmax(180px,1fr))]"
         } gap-x-4 md:gap-x-10 gap-y-20`}
       >
         <AnimatePresence mode="popLayout">
-          {postIts.map((postIt, i) => (
+          {postIts.map((postIt) => (
             <motion.div
               layout
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: postIt.rotation }}
-              exit={{ scale: 0, rotate: -10 }}
+              initial={{ scale: 0, rotate: -10, opacity: 0 }}
+              animate={{ scale: 1, rotate: postIt.rotation, opacity: 1 }}
+              exit={{ scale: 0, rotate: -10, opacity: 0 }}
               whileHover={{ scale: 1.05, rotate: 0 }}
-              ref={i === 0 ? ref : undefined}
               key={postIt.id}
               style={{
                 background: BG_COLORS[postIt.bgColorIndex],
@@ -145,6 +155,10 @@ export default function Main() {
             </motion.div>
           ))}
         </AnimatePresence>
+        <div
+          ref={ref}
+          className="invisible bg-pink-500 w-full aspect-square pt-[15%] p-[5%]"
+        />
       </div>
     </main>
   );

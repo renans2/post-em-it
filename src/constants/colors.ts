@@ -1,3 +1,5 @@
+import type { ToastType } from "../types/toast";
+
 export const BG_COLORS = [
   "linear-gradient(#D9D975, #D9D975 12%, #E3E372 14%, #E8E885)",
   "linear-gradient(#D9B775, #D9B775 12%, #E3BD72 14%, #EECF91)",
@@ -13,3 +15,12 @@ export const TEXT_COLORS = [
   "#FF0000",
   "#00DD00",
 ];
+
+export const TOAST_COLOR_MAPPER: Record<ToastType, string> = {
+  created:
+    "linear-gradient(to right, #89E789, #89E789 12%, #95EA95 14%, #AAEEAA)",
+  edited:
+    "linear-gradient(to right, #D9D975, #D9D975 12%, #E3E372 14%, #E8E885)",
+  deleted:
+    "linear-gradient(to right, #E78989, #E78989 12%, #EA9595 14%, #EEAAAA)",
+};

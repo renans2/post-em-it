@@ -1,12 +1,16 @@
 import React, {
   createContext,
   useContext,
+  useState,
   type Dispatch,
   type SetStateAction,
 } from "react";
 import type { PostIt } from "../../types/post-it";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import type { SortBy, SortOrder } from "../../types/sort";
+import type { ToastType } from "../../types/toast";
+
+const TOAST_DURATION = 3000;
 
 type PostItsContextType = {
   nextId: number;
@@ -18,6 +22,7 @@ type PostItsContextType = {
   sortOrder: SortOrder;
   setSortBy: Dispatch<SetStateAction<SortBy>>;
   setSortOrder: Dispatch<SetStateAction<SortOrder>>;
+  toastType: ToastType | undefined;
 };
 
 const PostItsContext = createContext<PostItsContextType | undefined>(undefined);
@@ -34,18 +39,30 @@ export default function PostItsProvider({
     "sort_order",
     "desc",
   );
+  const [toastType, setToastType] = useState<ToastType>();
 
   const addPostIt = (postIt: PostIt) => {
     setPostItsRaw((prev) => [...prev, postIt]);
     setNextId((prev) => prev + 1);
+    setToast("created");
   };
 
   const deletePostIt = (postItId: number) => {
     setPostItsRaw((prev) => prev.filter((p) => p.id !== postItId));
+    setToast("deleted");
   };
 
   const editPostIt = (postIt: PostIt) => {
     setPostItsRaw((prev) => prev.map((p) => (p.id !== postIt.id ? p : postIt)));
+    setToast("edited");
+  };
+
+  const setToast = (type: ToastType) => {
+    setToastType(type);
+
+    setTimeout(() => {
+      setToastType(undefined);
+    }, TOAST_DURATION);
   };
 
   const postIts = [...postItsRaw].sort((a, b) => {
@@ -69,6 +86,7 @@ export default function PostItsProvider({
         sortOrder,
         setSortBy,
         setSortOrder,
+        toastType,
       }}
     >
       {children}

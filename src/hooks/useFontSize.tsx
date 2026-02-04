@@ -1,12 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export default function useFontSize(id?: number) {
-  const ref = useRef(null);
+export default function useFontSize() {
+  const elementRef = useRef(null);
   const [fontSize, setFontSize] = useState(0);
 
-  useEffect(() => {
-    const el = ref.current;
+  const setRef = useCallback((node: any) => {
+    if (node) {
+      elementRef.current = node;
+    }
+  }, []);
 
+  useEffect(() => {
+    const el = elementRef.current;
     if (!el) return;
 
     const observer = new ResizeObserver(([entry]) => {
@@ -17,10 +22,10 @@ export default function useFontSize(id?: number) {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [id]);
+  }, []);
 
   return {
-    ref,
+    ref: setRef,
     fontSize,
   };
 }
