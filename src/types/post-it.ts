@@ -1,4 +1,4 @@
-export type PostIt = {
+export interface PostIt {
   id: number;
   bgColorIndex: number;
   textColorIndex: number;
@@ -7,4 +7,4 @@ export type PostIt = {
   rotation: number;
   createdAt: number;
   lastModifiedAt?: number;
-};
+}

@@ -32,14 +32,14 @@ export default function PostItsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [nextId, setNextId] = useLocalStorage<number>("nextid", 1);
+  const [toastType, setToastType] = useState<ToastType>();
+  const [nextId, setNextId] = useLocalStorage<number>("next_id", 1);
   const [postItsRaw, setPostItsRaw] = useLocalStorage<PostIt[]>("postits", []);
   const [sortBy, setSortBy] = useLocalStorage<SortBy>("sort_by", "created_at");
   const [sortOrder, setSortOrder] = useLocalStorage<SortOrder>(
     "sort_order",
     "desc",
   );
-  const [toastType, setToastType] = useState<ToastType>();
 
   const addPostIt = (postIt: PostIt) => {
     setPostItsRaw((prev) => [...prev, postIt]);
