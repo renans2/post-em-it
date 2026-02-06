@@ -4,8 +4,9 @@ import { BG_COLORS, TEXT_COLORS } from "../../constants/colors";
 import type { PostIt } from "../../types/post-it";
 import { FONT_CLASSES } from "../../constants/fonts";
 import useFontSize from "../../hooks/useFontSize";
-import { EMPTY_POST_IT } from "../../constants/empty-post-it";
 import { motion } from "motion/react";
+import { setStoredSetting } from "../../utils/stored-setting";
+import { getEmptyPostIt } from "../../utils/get-empty-postit";
 
 type CreateOrEditLayoutType = {
   data: { type: "create" } | { type: "edit"; postIt: PostIt };
@@ -19,10 +20,19 @@ export default function CreateOrEditLayout({
   const { nextId, addPostIt, deletePostIt, editPostIt } = usePostIts();
   const { ref, fontSize } = useFontSize();
   const [postIt, setPostIt] = useState<PostIt>(() =>
-    data.type === "edit" ? data.postIt : EMPTY_POST_IT,
+    data.type === "edit" ? data.postIt : getEmptyPostIt(),
   );
 
-  const handleChange = (key: keyof PostIt, val: any) => {
+  const handleChange = <K extends keyof PostIt>(key: K, val: PostIt[K]) => {
+    if (
+      data.type === "create" &&
+      (key === "bgColorIndex" ||
+        key === "textColorIndex" ||
+        key === "fontIndex")
+    ) {
+      setStoredSetting(key, JSON.stringify(val));
+    }
+
     setPostIt((prev) => ({
       ...prev,
       [key]: val,
@@ -30,6 +40,7 @@ export default function CreateOrEditLayout({
   };
 
   const handleCreate = () => {
+    if (data.type === "edit") return;
     addPostIt({
       ...postIt,
       id: nextId,
