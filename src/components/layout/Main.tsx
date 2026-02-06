@@ -12,9 +12,9 @@ import PostIt from "../ui/PostIt";
 import S_Select from "../ui/S_Select";
 
 const PANEL_SIZE_MAPPER: Record<PanelSize, string> = {
-  "1": "max-w-lg grid-cols-1 gap-y-[3%]",
-  "2": "max-w-2xl grid-cols-2 gap-y-[5%]",
-  "3": "max-w-4xl grid-cols-3 gap-y-[6%]",
+  "1": "max-w-lg grid-cols-1 gap-y-25 md:gap-y-30",
+  "2": "max-w-2xl grid-cols-2 gap-y-15 md:gap-y-25",
+  "3": "max-w-4xl grid-cols-3 gap-y-10 md:gap-y-20",
   max: "grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-y-20",
 };
 
