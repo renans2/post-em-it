@@ -32,11 +32,17 @@ export default function PostIt({ postIt, onClick, fontSize }: PostItProps) {
         value={postIt.content}
         className="resize-none h-full focus:outline-0 w-full text-shadow-sm text-shadow-black/40 overflow-y-hidden group-hover:overflow-y-auto"
       />
-      <p className="text-sm absolute top-[103%] w-full left-0 text-center font-medium text-black/30">
+      <p
+        style={{ fontSize: fontSize * 0.65 }}
+        className="text-sm absolute top-full translate-y-[20%] w-full left-0 text-center font-medium text-black/30"
+      >
         Created: {new Date(postIt.createdAt).toLocaleString().slice(0, 17)}
       </p>
       {postIt.lastModifiedAt && (
-        <p className="text-sm absolute top-[110%] w-full left-0 text-center font-medium text-black/30">
+        <p
+          style={{ fontSize: fontSize * 0.6 }}
+          className="text-sm absolute top-full translate-y-[105%] w-full left-0 text-center font-medium text-black/30"
+        >
           Modified:{" "}
           {new Date(postIt.lastModifiedAt).toLocaleString().slice(0, 17)}
         </p>

@@ -1,1 +1,1 @@
-export type PanelSize = "normal" | "max";
+export type PanelSize = "1" | "2" | "3" | "max";

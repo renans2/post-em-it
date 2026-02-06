@@ -11,6 +11,13 @@ import Toast from "../ui/Toast";
 import PostIt from "../ui/PostIt";
 import S_Select from "../ui/S_Select";
 
+const PANEL_SIZE_MAPPER: Record<PanelSize, string> = {
+  "1": "max-w-lg grid-cols-1 gap-y-[3%]",
+  "2": "max-w-2xl grid-cols-2 gap-y-[5%]",
+  "3": "max-w-4xl grid-cols-3 gap-y-[6%]",
+  max: "grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-y-20",
+};
+
 export default function Main() {
   const { ref, fontSize } = useFontSize();
   const [isCreating, setIsCreating] = useState(false);
@@ -19,7 +26,7 @@ export default function Main() {
     usePostIts();
   const [panelSize, setPanelSize] = useLocalStorage<PanelSize>(
     "panel_size",
-    "normal",
+    "3",
   );
 
   function NewButton() {
@@ -50,7 +57,9 @@ export default function Main() {
             value={panelSize}
             onChange={(e) => setPanelSize(e.target.value as PanelSize)}
           >
-            <option value="normal">Normal</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
             <option value="max">Max</option>
           </S_Select>
         </label>
@@ -96,7 +105,9 @@ export default function Main() {
           />
         )}
       </AnimatePresence>
-      {toastType && <Toast type={toastType} />}
+      <AnimatePresence>
+        {toastType && <Toast type={toastType} />}
+      </AnimatePresence>
       <NewButton />
       <Selects />
       {postIts.length === 0 && (
@@ -105,11 +116,9 @@ export default function Main() {
         </p>
       )}
       <div
-        className={`mx-auto grid ${
-          panelSize === "normal"
-            ? "max-w-4xl grid-cols-1 md:grid-cols-3"
-            : "grid-cols-[repeat(auto-fit,minmax(180px,1fr))]"
-        } gap-x-4 md:gap-x-10 gap-y-20`}
+        className={`mx-auto grid gap-x-4 md:gap-x-10 ${
+          PANEL_SIZE_MAPPER[panelSize]
+        }`}
       >
         <AnimatePresence>
           {postIts.map((postIt) => (
@@ -120,11 +129,11 @@ export default function Main() {
               fontSize={fontSize}
             />
           ))}
+          <div
+            ref={ref}
+            className="invisible w-full aspect-square pt-[15%] p-[5%]"
+          />
         </AnimatePresence>
-        <div
-          ref={ref}
-          className="invisible w-full aspect-square pt-[15%] p-[5%]"
-        />
       </div>
     </main>
   );
